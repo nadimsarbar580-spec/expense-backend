@@ -4,35 +4,20 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# In-memory database
 expenses = [
     {"id": 1, "title": "Lunch", "amount": 150, "category": "Food"},
     {"id": 2, "title": "Bus fare", "amount": 30, "category": "Transport"},
 ]
 next_id = 3
 
-# GET — return all expenses
 @app.route('/expenses', methods=['GET'])
 def get_expenses():
     return jsonify(expenses), 200
 
-# POST — add a new expense
 @app.route('/expenses', methods=['POST'])
 def add_expense():
     global next_id
     data = request.get_json()
-
-
-    # DELETE — remove an expense
-@app.route('/expenses/<int:expense_id>', methods=['DELETE'])
-def delete_expense(expense_id):
-    global expenses
-    expense = next((e for e in expenses if e["id"] == expense_id), None)
-    if not expense:
-        return jsonify({"error": "Expense not found"}), 404
-    expenses = [e for e in expenses if e["id"] != expense_id]
-    return jsonify({"message": "Expense deleted successfully"}), 200
-
 
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -52,6 +37,15 @@ def delete_expense(expense_id):
     expenses.append(expense)
     next_id += 1
     return jsonify(expense), 201
+
+@app.route('/expenses/<int:expense_id>', methods=['DELETE'])
+def delete_expense(expense_id):
+    global expenses
+    expense = next((e for e in expenses if e["id"] == expense_id), None)
+    if not expense:
+        return jsonify({"error": "Expense not found"}), 404
+    expenses = [e for e in expenses if e["id"] != expense_id]
+    return jsonify({"message": "Expense deleted successfully"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
