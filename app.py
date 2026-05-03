@@ -22,6 +22,18 @@ def add_expense():
     global next_id
     data = request.get_json()
 
+
+    # DELETE — remove an expense
+@app.route('/expenses/<int:expense_id>', methods=['DELETE'])
+def delete_expense(expense_id):
+    global expenses
+    expense = next((e for e in expenses if e["id"] == expense_id), None)
+    if not expense:
+        return jsonify({"error": "Expense not found"}), 404
+    expenses = [e for e in expenses if e["id"] != expense_id]
+    return jsonify({"message": "Expense deleted successfully"}), 200
+
+
     if not data:
         return jsonify({"error": "No data provided"}), 400
     if not data.get("title") or not isinstance(data["title"], str):
